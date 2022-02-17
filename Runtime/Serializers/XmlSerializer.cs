@@ -1,8 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Xml.Serialization;
-using System.Xml;
-using System.Xml.Linq;
 using System.Threading.Tasks;
 
 public class XmlSerializer : ISerializer

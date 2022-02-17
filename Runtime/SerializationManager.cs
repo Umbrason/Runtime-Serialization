@@ -5,10 +5,10 @@ using UnityEngine;
 
 public static class SerializationManager
 {
-    static ISerializer serializer;
+    public static ISerializer serializer;
     static SerializationManager()
     {
-        serializer = new XmlSerializer();
+        serializer = new BinarySerializer();
     }
 
     public static void Serialize(object target, string filePath) => serializer?.Serialize(target, filePath);
