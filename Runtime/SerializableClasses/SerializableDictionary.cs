@@ -1,9 +1,34 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.Xml.Serialization;
 
-
-public class XmlDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IXmlSerializable
+[Serializable]
+public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IXmlSerializable, ISerializable
 {
+    public SerializableDictionary() { }
+    protected SerializableDictionary(SerializationInfo info, StreamingContext context)
+    {
+        var count = info.GetInt32("C");
+        for (int i = 0; i < count; i++)
+        {
+            var key = (TKey)info.GetValue("K", typeof(TKey));
+            var value = (TValue)info.GetValue("V", typeof(TValue));
+            this.Add(key, value);
+        }
+    }
+
+    public override void GetObjectData(SerializationInfo info, StreamingContext context)
+    {
+        info.AddValue("C", this.Count);
+        foreach (var pair in this)
+        {
+            info.AddValue("K", pair.Key);
+            info.AddValue("V", pair.Value);
+        }
+    }
+
+
     public void ReadXml(System.Xml.XmlReader reader)
     {
         var keySerializer = new System.Xml.Serialization.XmlSerializer(typeof(TKey));
@@ -61,7 +86,7 @@ public class XmlDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IXmlSeriali
 
 }
 
-[System.Serializable]
+[Serializable]
 struct Entry<TKey, TValue>
 {
     TKey key;

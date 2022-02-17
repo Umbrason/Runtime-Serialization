@@ -1,6 +1,7 @@
+using System;
 using UnityEngine;
 
-    [System.Serializable]
+    [Serializable]
     public struct SerializableVector3
     {
         public float x, y, z;

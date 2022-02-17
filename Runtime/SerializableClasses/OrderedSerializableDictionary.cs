@@ -2,41 +2,42 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Xml.Serialization;
-using UnityEngine;
+using System;
+using System.Runtime.Serialization;
 
-
-public class OrderedXmlDictionary<TKey, TValue> : IXmlSerializable, IEnumerable<KeyValuePair<TKey, TValue>>
+[Serializable]
+public class OrderedSerializableDictionary<TKey, TValue> : ISerializable, IXmlSerializable, IEnumerable<KeyValuePair<TKey, TValue>>
 {
     private List<TKey> keyOrder = new List<TKey>();
-    private XmlDictionary<TKey, TValue> xmlDictionary = new XmlDictionary<TKey, TValue>();
+    private SerializableDictionary<TKey, TValue> serializableDictionary = new SerializableDictionary<TKey, TValue>();
     public int Count { get => keyOrder.Count; }
     public TKey[] Keys { get { return keyOrder.ToArray(); } }
     public TValue[] Values { get { return (from key in Keys select this[key]).ToArray(); } }
 
     public void Add(TKey key, TValue value)
     {
-        xmlDictionary.Add(key, value);
+        serializableDictionary.Add(key, value);
         keyOrder.Add(key);
     }
 
     public void Remove(TKey key)
     {
-        xmlDictionary.Remove(key);
+        serializableDictionary.Remove(key);
         keyOrder.Remove(key);
     }
 
     public TValue this[int index]
     {
-        get => xmlDictionary[keyOrder[index]];
-        set => xmlDictionary[keyOrder[index]] = value;
+        get => serializableDictionary[keyOrder[index]];
+        set => serializableDictionary[keyOrder[index]] = value;
     }
     public TValue this[TKey key]
     {
-        get => xmlDictionary[key];
-        set => xmlDictionary[key] = value;
+        get => serializableDictionary[key];
+        set => serializableDictionary[key] = value;
     }
 
-    public bool TryGetValue(TKey key, out TValue value) => xmlDictionary.TryGetValue(key, out value);
+    public bool TryGetValue(TKey key, out TValue value) => serializableDictionary.TryGetValue(key, out value);
 
     public void SetOrder(IEnumerable<TKey> order)
     {
@@ -50,13 +51,32 @@ public class OrderedXmlDictionary<TKey, TValue> : IXmlSerializable, IEnumerable<
         keyOrder = finalOrder;
     }
 
-
-
     public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
     {
-        return (from x in keyOrder select new KeyValuePair<TKey, TValue>(x, xmlDictionary[x])).GetEnumerator();
+        return (from x in keyOrder select new KeyValuePair<TKey, TValue>(x, serializableDictionary[x])).GetEnumerator();
     }
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    public OrderedSerializableDictionary() { }
+    protected OrderedSerializableDictionary(SerializationInfo info, StreamingContext context)
+    {
+        var count = info.GetInt32("C");
+        for (int i = 0; i < count; i++)
+        {
+            var key = (TKey)info.GetValue("K", typeof(TKey));
+            var value = (TValue)info.GetValue("V", typeof(TValue));
+            this.Add(key, value);
+        }
+    }
+    public void GetObjectData(SerializationInfo info, StreamingContext context)
+    {
+        info.AddValue("C", this.Count);
+        foreach (var key in keyOrder)
+        {
+            info.AddValue("K", key, typeof(TKey));
+            info.AddValue("V", this[key], typeof(TValue));
+        }
+    }
 
     public void ReadXml(System.Xml.XmlReader reader)
     {
