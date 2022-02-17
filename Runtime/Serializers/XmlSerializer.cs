@@ -50,7 +50,7 @@ public class XmlSerializer : ISerializer
         target = default;
         return false;
     }
-    public Func<Task<T>> GetAsyncDeserializationMethod<T>(string filePath) where T : new() => async () =>
+    public Func<Task<T>> GetAsyncDeserializationMethod<T>(string filePath) => async () =>
         {
             StreamReader reader = File.OpenText(filePath);
             string text = await reader.ReadToEndAsync();

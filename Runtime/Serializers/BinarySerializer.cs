@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 public class BinarySerializer : ISerializer
 {
     private BinaryFormatter binaryFormatter = new BinaryFormatter();
-    public Func<Task<T>> GetAsyncDeserializationMethod<T>(string filePath) where T : new()
+    public Func<Task<T>> GetAsyncDeserializationMethod<T>(string filePath)
     {
         return async () =>
         {
