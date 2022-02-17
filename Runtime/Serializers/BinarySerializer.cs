@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 public class BinarySerializer : ISerializer
 {
-    private BinaryFormatter binaryFormatter = new BinaryFormatter();
+    private static BinaryFormatter binaryFormatter = new BinaryFormatter();
     public Func<Task<T>> GetAsyncDeserializationMethod<T>(string filePath)
     {
         return async () =>
@@ -25,20 +25,6 @@ public class BinarySerializer : ISerializer
             binaryFormatter.Serialize(fileStream, target);
     }
 
-    public bool TryDeserialize<T>(string filePath, out T target)
-    {
-        using (var stream = File.OpenRead(filePath))
-        {
-            var readObject = binaryFormatter.Deserialize(stream);
-            if (!(readObject is T))
-            {
-                target = default;
-                return false;
-            }
-            target = (T)readObject;
-            return true;
-        }
-    }
 
     public bool TryDeserialize(string filePath, Type type, out object target)
     {
@@ -54,4 +40,12 @@ public class BinarySerializer : ISerializer
             return true;
         }
     }
+    
+    public bool TryDeserialize<T>(string filePath, out T target)
+    {
+        var success = TryDeserialize(filePath, typeof(T), out object data);
+        target = success ? (T)data : default;
+        return success;
+
+    }    
 }

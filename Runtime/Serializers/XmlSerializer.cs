@@ -3,6 +3,7 @@ using System.IO;
 using System.Xml.Serialization;
 using System.Threading.Tasks;
 
+[Obsolete]
 public class XmlSerializer : ISerializer
 {
     public void Serialize(object target, string filePath)
