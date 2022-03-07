@@ -21,14 +21,13 @@ public class BinarySerializer : ISerializer
 
     public void Serialize(object target, string filePath)
     {
-        var fileExists = File.Exists(filePath);        
-        using (var fileStream = fileExists ? File.OpenWrite(filePath) : File.Create(filePath))
+        using (var fileStream = File.Exists(filePath) ? File.OpenWrite(filePath) : (() => { Directory.CreateDirectory(Path.GetDirectoryName(filePath)); return File.Create(filePath); })())
             binaryFormatter.Serialize(fileStream, target);
     }
 
 
     public bool TryDeserialize(string filePath, Type type, out object target)
-    {        
+    {
         if (!File.Exists(filePath))
             return (target = null) != null;
         using (var stream = File.OpenRead(filePath))
