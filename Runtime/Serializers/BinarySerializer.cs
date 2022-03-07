@@ -21,13 +21,15 @@ public class BinarySerializer : ISerializer
 
     public void Serialize(object target, string filePath)
     {
-        using (var fileStream = File.OpenWrite(filePath))
+        using (var fileStream = File.Exists(filePath) ? File.OpenWrite(filePath) : File.Create(filePath))
             binaryFormatter.Serialize(fileStream, target);
     }
 
 
     public bool TryDeserialize(string filePath, Type type, out object target)
     {
+        if (!File.Exists(filePath))
+            return false;
         using (var stream = File.OpenRead(filePath))
         {
             var readObject = binaryFormatter.Deserialize(stream);
@@ -40,12 +42,12 @@ public class BinarySerializer : ISerializer
             return true;
         }
     }
-    
+
     public bool TryDeserialize<T>(string filePath, out T target)
     {
         var success = TryDeserialize(filePath, typeof(T), out object data);
         target = success ? (T)data : default;
         return success;
 
-    }    
+    }
 }

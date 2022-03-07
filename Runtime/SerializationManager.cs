@@ -12,5 +12,4 @@ public static class SerializationManager
     {
         return await serializer.GetAsyncDeserializationMethod<T>(filePath)();
     }
-
 }
