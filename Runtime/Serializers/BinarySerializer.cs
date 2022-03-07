@@ -27,9 +27,9 @@ public class BinarySerializer : ISerializer
 
 
     public bool TryDeserialize(string filePath, Type type, out object target)
-    {
+    {        
         if (!File.Exists(filePath))
-            return false;
+            return (target = null) != null;
         using (var stream = File.OpenRead(filePath))
         {
             var readObject = binaryFormatter.Deserialize(stream);
