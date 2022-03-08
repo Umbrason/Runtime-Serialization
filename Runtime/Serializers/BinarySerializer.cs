@@ -21,7 +21,7 @@ public class BinarySerializer : ISerializer
 
     public void Serialize(object target, string filePath)
     {
-        Directory.CreateDirectory(Path.GetDirectoryName(filePath));
+        SerializationUtil.CreateDirectory(Path.GetDirectoryName(filePath));        
         using (var fileStream = File.Exists(filePath) ? File.OpenWrite(filePath) : File.Create(filePath))
             binaryFormatter.Serialize(fileStream, target);
     }
