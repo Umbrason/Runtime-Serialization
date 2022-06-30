@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
 
@@ -26,13 +27,19 @@ public class BinarySerializer : ISerializer
             binaryFormatter.Serialize(fileStream, target);
     }
 
+    public bool TryDeserialize<T>(string filePath, out T target)
+    {
+        var success = TryDeserialize(filePath, typeof(T), out object data);
+        target = success ? (T)data : default;
+        return success;
+    }
 
     public bool TryDeserialize(string filePath, Type type, out object target)
     {
         if (!File.Exists(filePath))
             return (target = null) != null;
         using (var stream = File.OpenRead(filePath))
-        {
+        {            
             var readObject = binaryFormatter.Deserialize(stream);
             if (readObject.GetType() != type)
             {
@@ -44,11 +51,4 @@ public class BinarySerializer : ISerializer
         }
     }
 
-    public bool TryDeserialize<T>(string filePath, out T target)
-    {
-        var success = TryDeserialize(filePath, typeof(T), out object data);
-        target = success ? (T)data : default;
-        return success;
-
-    }
 }
