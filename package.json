@@ -1,5 +1,5 @@
 {
-  "name": "com.umbrason.runtimeserialization",
+  "name": "com.umbrason.runtime-serialization",
   "version": "1.0.0",
   "displayName": "Runtime Serialization",
   "description": "This package contains utility functions and classes for serializing during runtime",
